@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ROVIX | Admin</title>
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Montserrat:wght@400;500&display=swap">
+
+  <style>
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    body{
+      background:#0b0b0b;
+      color:#f5f0e8;
+      font-family:Montserrat,sans-serif;
+      padding:30px;
+    }
+
+    .admin{
+      max-width:900px;
+      margin:auto;
+    }
+
+    h1{
+      font-family:"Cormorant Garamond",serif;
+      font-size:55px;
+      margin-bottom:10px;
+    }
+
+    .subtitle{
+      color:#888;
+      margin-bottom:40px;
+    }
+
+    .box{
+      background:#111;
+      border:1px solid #292929;
+      padding:30px;
+      margin-bottom:25px;
+    }
+
+    h2{
+      font-family:"Cormorant Garamond",serif;
+      font-size:32px;
+      margin-bottom:25px;
+    }
+
+    label{
+      display:block;
+      font-size:11px;
+      letter-spacing:2px;
+      color:#aaa;
+      margin:18px 0 8px;
+    }
+
+    input, textarea, select{
+      width:100%;
+      padding:14px;
+      background:#080808;
+      border:1px solid #444;
+      color:white;
+      outline:none;
+    }
+
+    textarea{
+      min-height:100px;
+      resize:vertical;
+    }
+
+    button{
+      margin-top:20px;
+      padding:14px 22px;
+      border:1px solid #777;
+      background:#f5f0e8;
+      color:#111;
+      cursor:pointer;
+      letter-spacing:1px;
+    }
+
+    .product{
+      border-top:1px solid #333;
+      padding:20px 0;
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      align-items:center;
+    }
+
+    .product-info strong{
+      font-family:"Cormorant Garamond",serif;
+      font-size:25px;
+    }
+
+    .delete{
+      background:#111;
+      color:#fff;
+      border:1px solid #555;
+    }
+
+    .back{
+      display:inline-block;
+      margin-bottom:35px;
+      color:#aaa;
+      font-size:12px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="admin">
+
+  <a href="index.html" class="back">
+    ← BACK TO STORE
+  </a>
+
+  <h1>ROVIX ADMIN</h1>
+
+  <p class="subtitle">
+    Manage your products and contact details.
+  </p>
+
+
+  <!-- ADD PRODUCT -->
+
+  <div class="box">
+
+    <h2>Add Product</h2>
+
+    <label>PRODUCT NAME</label>
+    <input id="productName"
+      placeholder="Example: Premium Oversized Tee">
+
+
+    <label>PRICE</label>
+    <input id="productPrice"
+      type="number"
+      placeholder="2499">
+
+
+    <label>IMAGE URL</label>
+    <input id="productImage"
+      placeholder="Paste image URL">
+
+
+    <label>SIZES</label>
+    <input id="productSizes"
+      placeholder="S, M, L, XL">
+
+
+    <button onclick="addProduct()">
+      ADD PRODUCT
+    </button>
+
+  </div>
+
+
+  <!-- PRODUCTS -->
+
+  <div class="box">
+
+    <h2>Your Products</h2>
+
+    <div id="productList"></div>
+
+  </div>
+
+
+  <!-- CONTACT -->
+
+  <div class="box">
+
+    <h2>Contact Details</h2>
+
+    <label>WHATSAPP NUMBER</label>
+    <input id="whatsapp">
+
+
+    <label>INSTAGRAM LINK</label>
+    <input id="instagram">
+
+
+    <label>INSTAGRAM USERNAME</label>
+    <input id="instagramName">
+
+
+    <label>EMAIL</label>
+    <input id="email">
+
+
+    <button onclick="saveContact()">
+      SAVE CONTACT
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+let products =
+JSON.parse(localStorage.getItem("rovixProducts")) || [];
+
+
+let contact =
+JSON.parse(localStorage.getItem("rovixContact")) || {
+
+  whatsapp:"919876543210",
+
+  instagram:"https://instagram.com/yourbrand",
+
+  instagramName:"@yourbrand",
+
+  email:"hello@yourbrand.com"
+
+};
+
+
+/* PRODUCTS */
+
+function addProduct(){
+
+  const name =
+    document.getElementById("productName").value;
+
+  const price =
+    Number(document.getElementById("productPrice").value);
+
+  const image =
+    document.getElementById("productImage").value;
+
+  const sizes =
+    document.getElementById("productSizes")
+    .value
+    .split(",")
+    .map(x => x.trim());
+
+
+  if(!name || !price || !image){
+
+    alert("Please fill product name, price and image.");
+
+    return;
+
+  }
+
+
+  products.push({
+
+    id:Date.now(),
+
+    name:name,
+
+    price:price,
+
+    image:image,
+
+    sizes:sizes
+
+  });
+
+
+  localStorage.setItem(
+    "rovixProducts",
+    JSON.stringify(products)
+  );
+
+
+  document.getElementById("productName").value="";
+  document.getElementById("productPrice").value="";
+  document.getElementById("productImage").value="";
+  document.getElementById("productSizes").value="";
+
+
+  showProducts();
+
+  alert("Product added ✓");
+
+}
+
+
+/* SHOW PRODUCTS */
+
+function showProducts(){
+
+  const list =
+    document.getElementById("productList");
+
+  list.innerHTML="";
+
+
+  if(products.length===0){
+
+    list.innerHTML =
+      "<p style='color:#777'>No products yet.</p>";
+
+    return;
+
+  }
+
+
+  products.forEach((product,index)=>{
+
+    list.innerHTML += `
+
+      <div class="product">
+
+        <div class="product-info">
+
+          <strong>
+            ${product.name}
+          </strong>
+
+          <p>
+            ₹${product.price}
+          </p>
+
+        </div>
+
+        <button
+          class="delete"
+          onclick="deleteProduct(${index})"
+        >
+          DELETE
+        </button>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+/* DELETE */
+
+function deleteProduct(index){
+
+  if(!confirm("Delete this product?"))
+    return;
+
+
+  products.splice(index,1);
+
+
+  localStorage.setItem(
+    "rovixProducts",
+    JSON.stringify(products)
+  );
+
+
+  showProducts();
+
+}
+
+
+/* CONTACT */
+
+function loadContact(){
+
+  document.getElementById("whatsapp").value =
+    contact.whatsapp;
+
+  document.getElementById("instagram").value =
+    contact.instagram;
+
+  document.getElementById("instagramName").value =
+    contact.instagramName;
+
+  document.getElementById("email").value =
+    contact.email;
+
+}
+
+
+function saveContact(){
+
+  contact = {
+
+    whatsapp:
+      document.getElementById("whatsapp").value,
+
+    instagram:
+      document.getElementById("instagram").value,
+
+    instagramName:
+      document.getElementById("instagramName").value,
+
+    email:
+      document.getElementById("email").value
+
+  };
+
+
+  localStorage.setItem(
+    "rovixContact",
+    JSON.stringify(contact)
+  );
+
+
+  alert("Contact details saved ✓");
+
+}
+
+
+showProducts();
+loadContact();
+
+</script>
+
+</body>
+</html>
